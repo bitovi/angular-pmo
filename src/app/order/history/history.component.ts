@@ -24,9 +24,29 @@ export class OrderHistoryComponent implements OnInit {
 
   constructor(
     private orderService: OrderService
-    ) {
-      this.socket = io(environment.apiUrl);
-    }
+  ) {
+    this.socket = io(environment.apiUrl);
+  }
+
+  get newOrders() {
+    const orders = this.orders.value.filter((order) => order.status === 'new');
+    return orders;
+  }
+
+  get preparingOrders() {
+    const orders = this.orders.value.filter((order) => order.status === 'preparing');
+    return orders;
+  }
+
+  get deliveryOrders() {
+    const orders = this.orders.value.filter((order) => order.status === 'delivery');
+    return orders;
+  }
+
+  get deliveredOrders() {
+    const orders = this.orders.value.filter((order) => order.status === 'delivered');
+    return orders;
+  }
 
   ngOnInit() {
     this.getOrders();
@@ -36,13 +56,13 @@ export class OrderHistoryComponent implements OnInit {
     });
 
     this.socket.on('orders updated', (order: Order) => {
-      const orderIndex =  this.orders.value.findIndex(item => item._id === order._id);
+      const orderIndex = this.orders.value.findIndex(item => item._id === order._id);
       this.orders.value.splice(orderIndex, 1);
       this.orders.value.push(order);
     });
 
     this.socket.on('orders removed', (order: Order) => {
-      const orderIndex =  this.orders.value.findIndex(item => item._id === order._id);
+      const orderIndex = this.orders.value.findIndex(item => item._id === order._id);
       this.orders.value.splice(orderIndex, 1);
     });
   }
@@ -52,25 +72,5 @@ export class OrderHistoryComponent implements OnInit {
       this.orders.value = res.data;
     });
   }
-
-  get newOrders() {
-    const orders =  this.orders.value.filter((order) => order.status === 'new');
-    return orders;
-  }
-
-   get preparingOrders() {
-    const orders =  this.orders.value.filter((order) => order.status === 'preparing');
-    return orders;
-   }
-
-   get deliveryOrders() {
-    const orders =  this.orders.value.filter((order) => order.status === 'delivery');
-    return orders;
-   }
-
-   get deliveredOrders() {
-    const orders =  this.orders.value.filter((order) => order.status === 'delivered');
-    return orders;
-   }
 
 }

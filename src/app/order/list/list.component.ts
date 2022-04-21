@@ -20,7 +20,7 @@ export class OrderListComponent implements OnInit {
 
   constructor(private orderService: OrderService) { }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   markAs(order: Order, action: string) {
     this.orderService.updateOrder(order, action).subscribe(() => {

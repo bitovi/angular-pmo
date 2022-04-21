@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Order, OrderService } from '../order.service';
+import { Order } from '../order.model';
+import { OrderService } from '../order.service';
 
 
 @Component({
@@ -19,7 +20,7 @@ export class OrderListComponent implements OnInit {
 
   constructor(private orderService: OrderService) { }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   markAs(order: Order, action: string) {
     this.orderService.updateOrder(order, action).subscribe(() => {

@@ -1,6 +1,6 @@
 import { Component, Input, forwardRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Item }  from '../order.service';
+import { Item } from '../order.model';
 
 @Component({
   selector: 'pmo-menu-items',
@@ -19,9 +19,6 @@ export class MenuItemsComponent implements ControlValueAccessor {
   // eslint-disable-next-line @angular-eslint/no-input-rename
   @Input('value') _value?: Item[];
 
-  onChange: any = () => { };
-  onTouched: any = () => { };
-
   get value() {
     return this._value;
   }
@@ -32,11 +29,14 @@ export class MenuItemsComponent implements ControlValueAccessor {
     this.onTouched();
   }
 
-  registerOnChange( fn: any ): void {
+  onChange: any = () => { };
+  onTouched: any = () => { };
+
+  registerOnChange(fn: any): void {
     this.onChange = fn;
   }
 
-  registerOnTouched( fn: any ): void {
+  registerOnTouched(fn: any): void {
     this.onTouched = fn;
   }
 
@@ -47,7 +47,7 @@ export class MenuItemsComponent implements ControlValueAccessor {
   toggleItem(item: Item) {
     if (this._value) {
       const index = this._value.indexOf(item);
-      if(index !== -1) {
+      if (index !== -1) {
         this._value.splice(index, 1);
       } else {
         this._value.push(item);

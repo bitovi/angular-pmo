@@ -4,10 +4,11 @@ import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/fo
 
 import { RestaurantService } from '../restaurant/restaurant.service';
 import { Restaurant } from '../restaurant/restaurant';
-import { OrderService, Order, Item } from './order.service';
+import { OrderService } from './order.service';
 import { Subject } from 'rxjs';
-import { takeUntil } from "rxjs/operators";
-import { ItemTotalPipe } from "../shared/item-total.pipe";
+import { takeUntil } from 'rxjs/operators';
+import { ItemTotalPipe } from '../shared/item-total.pipe';
+import { Item, Order } from './order.model';
 
 
 const minLengthArray = (min: number) => (c: AbstractControl): {[key: string]: any} | null => {

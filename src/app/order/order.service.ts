@@ -2,20 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Config } from '../restaurant/restaurant.service';
-
-export interface Item {
-  name: string;
-  price: number;
-}
-
-export interface Order {
-  _id: string;
-  name: string;
-  address: string;
-  phone: string;
-  status: string;
-  items: Item[];
-}
+import { Order } from './order.model';
 
 @Injectable({
   providedIn: 'root'

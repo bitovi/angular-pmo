@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import {Order} from "../order.service";
+import { Order } from '../order.model';
 
 @Component({
   selector: 'pmo-order-details',
@@ -7,7 +7,7 @@ import {Order} from "../order.service";
   styleUrls: ['./details.component.css']
 })
 export class OrderDetailsComponent implements OnInit {
-  @Input() order? : Order;
+  @Input() order?: Order;
 
   constructor() { }
 

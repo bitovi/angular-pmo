@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Order, OrderService } from '../order.service';
+import { Order } from '../order.model';
+import { OrderService } from '../order.service';
 
 
 @Component({

@@ -20,6 +20,7 @@ import { OrderHistoryComponent } from './order/history/history.component';
 import { OnlyNumbersDirective } from './shared/only-numbers.directive';
 import { ItemTotalPipe } from './shared/item-total.pipe';
 import { StoreModule } from '@ngrx/store';
+import { orderReducer } from './state/order.reducer';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,7 @@ import { StoreModule } from '@ngrx/store';
     HttpClientModule,
     ReactiveFormsModule,
     TabsModule.forRoot(),
-    StoreModule.forRoot({}, {})
+    StoreModule.forRoot({ order: orderReducer })
   ],
   providers: [
     ItemTotalPipe,

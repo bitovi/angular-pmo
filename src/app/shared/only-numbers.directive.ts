@@ -1,7 +1,8 @@
 import {Directive, ElementRef, HostListener} from '@angular/core';
 
 @Directive({
-  selector: '[pmoOnlyNumbers]'
+    selector: '[pmoOnlyNumbers]',
+    standalone: true
 })
 export class OnlyNumbersDirective {
 

@@ -1,10 +1,9 @@
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { provideRouter } from '@angular/router';
 
 import { OrderComponent } from './order.component';
-import {ItemTotalPipe} from "../shared/item-total.pipe";
+import { ItemTotalPipe } from '../shared/item-total.pipe';
 
 describe('OrderComponent', () => {
   let component: OrderComponent;
@@ -12,15 +11,9 @@ describe('OrderComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientModule,
-        ReactiveFormsModule,
-        RouterModule.forRoot([])
-      ],
-      providers: [ItemTotalPipe],
-      declarations: [ OrderComponent ]
-    })
-    .compileComponents();
+      imports: [OrderComponent],
+      providers: [provideHttpClient(), provideRouter([]), ItemTotalPipe],
+    }).compileComponents();
   });
 
   beforeEach(() => {

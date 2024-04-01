@@ -6,6 +6,7 @@ import {
   Validators,
   FormGroup,
   FormControl,
+  ReactiveFormsModule,
 } from '@angular/forms';
 
 import { RestaurantService } from '../restaurant/restaurant.service';
@@ -14,6 +15,11 @@ import { OrderService, Order, Item } from './order.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ItemTotalPipe } from '../shared/item-total.pipe';
+import { OnlyNumbersDirective } from '../shared/only-numbers.directive';
+import { MenuItemsComponent } from './menu-items/menu-items.component';
+import { TabsModule } from 'ngx-bootstrap/tabs';
+import { OrderDetailsComponent } from './details/details.component';
+import { NgIf, CurrencyPipe } from '@angular/common';
 
 interface OrderForm {
   restaurant: FormControl<string | undefined>;
@@ -36,6 +42,16 @@ const minLengthArray =
   selector: 'pmo-order',
   templateUrl: './order.component.html',
   styleUrls: ['./order.component.css'],
+  standalone: true,
+  imports: [
+    NgIf,
+    OrderDetailsComponent,
+    ReactiveFormsModule,
+    TabsModule,
+    MenuItemsComponent,
+    OnlyNumbersDirective,
+    CurrencyPipe,
+  ],
 })
 export class OrderComponent implements OnInit, OnDestroy {
   orderForm?: FormGroup<OrderForm>;

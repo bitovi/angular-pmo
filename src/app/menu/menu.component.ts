@@ -1,8 +1,0 @@
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'pmo-menu',
-  templateUrl: './menu.component.html',
-  styleUrls: ['./menu.component.css'],
-})
-export class MenuComponent {}

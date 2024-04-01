@@ -1,13 +1,11 @@
-import {Pipe, PipeTransform} from '@angular/core';
-import {Item} from "../order/order.service";
-
+import { Pipe, PipeTransform } from '@angular/core';
+import { Item } from '../order/order.service';
 
 @Pipe({
-  name: 'itemTotal'
+  name: 'itemTotal',
+  standalone: true,
 })
-
 export class ItemTotalPipe implements PipeTransform {
-
   transform(items: Item[]): number {
     let itemTotal = 0.0;
     if (items.length) {
@@ -18,5 +16,4 @@ export class ItemTotalPipe implements PipeTransform {
     }
     return itemTotal;
   }
-
 }

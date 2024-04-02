@@ -1,10 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 
 import { RestaurantService, Config, City, State } from './restaurant.service';
 import { Restaurant } from './restaurant';
 import { takeUntil, tap } from 'rxjs/operators';
+import { ImageUrlPipe } from '../shared/image-url.pipe';
+import { RouterLink } from '@angular/router';
+import { NgIf, NgFor } from '@angular/common';
 
 export interface Data<T> {
   value: Array<T>;
@@ -12,9 +15,17 @@ export interface Data<T> {
 }
 
 @Component({
-  selector: 'pmo-restaurant',
-  templateUrl: './restaurant.component.html',
-  styleUrls: ['./restaurant.component.css'],
+    selector: 'pmo-restaurant',
+    templateUrl: './restaurant.component.html',
+    styleUrls: ['./restaurant.component.css'],
+    standalone: true,
+    imports: [
+        ReactiveFormsModule,
+        NgIf,
+        NgFor,
+        RouterLink,
+        ImageUrlPipe,
+    ],
 })
 export class RestaurantComponent implements OnInit, OnDestroy {
   form!: FormGroup<{

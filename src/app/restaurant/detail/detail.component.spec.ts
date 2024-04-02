@@ -1,6 +1,6 @@
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterModule } from '@angular/router';
+import { provideRouter } from '@angular/router';
 
 import { RestaurantDetailComponent } from './detail.component';
 
@@ -10,10 +10,9 @@ describe('DetailComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ HttpClientModule, RouterModule.forRoot([]) ],
-      declarations: [ RestaurantDetailComponent ]
-    })
-    .compileComponents();
+      imports: [RestaurantDetailComponent],
+      providers: [provideHttpClient(), provideRouter([])],
+    }).compileComponents();
   });
 
   beforeEach(() => {

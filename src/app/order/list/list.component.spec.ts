@@ -1,8 +1,7 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterModule } from '@angular/router';
 
 import { OrderListComponent } from './list.component';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('ListComponent', () => {
   let component: OrderListComponent;
@@ -10,10 +9,9 @@ describe('ListComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ HttpClientTestingModule, RouterModule ],
-      declarations: [ OrderListComponent ],
-    })
-    .compileComponents();
+      imports: [OrderListComponent],
+      providers: [provideHttpClient()],
+    }).compileComponents();
   });
 
   beforeEach(() => {

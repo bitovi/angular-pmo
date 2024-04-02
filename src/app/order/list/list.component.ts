@@ -1,13 +1,16 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Order, OrderService } from '../order.service';
-
+import { ItemTotalPipe } from '../../shared/item-total.pipe';
+import { NgIf, NgFor, NgClass, CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'pmo-order-list',
   templateUrl: './list.component.html',
-  styleUrls: ['./list.component.css']
+  styleUrls: ['./list.component.css'],
+  standalone: true,
+  imports: [NgIf, NgFor, NgClass, CurrencyPipe, ItemTotalPipe],
 })
-export class OrderListComponent implements OnInit {
+export class OrderListComponent {
   @Input() orders: Order[] = [];
   @Input() listTitle?: string;
   @Input() status?: string;
@@ -17,18 +20,13 @@ export class OrderListComponent implements OnInit {
   @Input() emptyMessage?: string;
   isPending = false;
 
-  constructor(private orderService: OrderService) { }
-
-  ngOnInit() {}
+  constructor(private orderService: OrderService) {}
 
   markAs(order: Order, action: string) {
-    this.orderService.updateOrder(order, action).subscribe(() => {
-    });
+    this.orderService.updateOrder(order, action).subscribe(() => {});
   }
 
   delete(id: string) {
-    this.orderService.deleteOrder(id).subscribe(() => {
-    });
+    this.orderService.deleteOrder(id).subscribe(() => {});
   }
-
 }

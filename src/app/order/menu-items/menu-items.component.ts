@@ -1,6 +1,7 @@
 import { Component, Input, forwardRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Item }  from '../order.service';
+import { Item } from '../order.service';
+import { NgFor, CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'pmo-menu-items',
@@ -9,9 +10,11 @@ import { Item }  from '../order.service';
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => MenuItemsComponent),
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
+  standalone: true,
+  imports: [NgFor, CurrencyPipe],
 })
 export class MenuItemsComponent implements ControlValueAccessor {
   @Input() data?: Item[];
@@ -19,8 +22,8 @@ export class MenuItemsComponent implements ControlValueAccessor {
   // eslint-disable-next-line @angular-eslint/no-input-rename
   @Input('value') _value?: Item[];
 
-  onChange: any = () => { };
-  onTouched: any = () => { };
+  onChange: any = () => {};
+  onTouched: any = () => {};
 
   get value() {
     return this._value;
@@ -32,11 +35,11 @@ export class MenuItemsComponent implements ControlValueAccessor {
     this.onTouched();
   }
 
-  registerOnChange( fn: any ): void {
+  registerOnChange(fn: any): void {
     this.onChange = fn;
   }
 
-  registerOnTouched( fn: any ): void {
+  registerOnTouched(fn: any): void {
     this.onTouched = fn;
   }
 
@@ -47,7 +50,7 @@ export class MenuItemsComponent implements ControlValueAccessor {
   toggleItem(item: Item) {
     if (this._value) {
       const index = this._value.indexOf(item);
-      if(index !== -1) {
+      if (index !== -1) {
         this._value.splice(index, 1);
       } else {
         this._value.push(item);
@@ -55,5 +58,4 @@ export class MenuItemsComponent implements ControlValueAccessor {
       this.writeValue(this._value);
     }
   }
-
 }

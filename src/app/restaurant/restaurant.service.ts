@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, resource } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Restaurant } from './restaurant';
+import { firstValueFrom } from 'rxjs';
 
 export interface Config<T> {
   data: T[];
@@ -17,24 +18,47 @@ export interface City {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RestaurantService {
-
-  constructor(private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient) {}
 
   getStates() {
-    return this.httpClient.get<Config<State>>('/api/states');
+    return resource({
+      request: () => ({}),
+      loader: () =>
+        firstValueFrom(this.httpClient.get<Config<State>>('/api/states')),
+    });
   }
 
-  getCities(state: string) {
-    const options = { params: new HttpParams().set('state', state)};
-    return this.httpClient.get<Config<City>>('/api/cities', options);
+  getCities(request: () => { state: string } | undefined) {
+    return resource({
+      request,
+      loader: ({ request }) => {
+        const options = {
+          params: new HttpParams().set('state', request!.state),
+        };
+        return firstValueFrom(
+          this.httpClient.get<Config<City>>('/api/cities', options)
+        );
+      },
+    });
   }
 
-  getRestaurants(state: string, city: string) {
-    const options = { params: new HttpParams().set('filter[address.state]', state).set('filter[address.city]', city) };
-    return this.httpClient.get<Config<Restaurant>>('/api/restaurants', options);
+  getRestaurants(request: () => { state: string; city: string } | undefined) {
+    return resource({
+      request,
+      loader: ({ request }) => {
+        const options = {
+          params: new HttpParams()
+            .set('filter[address.state]', request!.state)
+            .set('filter[address.city]', request!.city),
+        };
+        return firstValueFrom(
+          this.httpClient.get<Config<Restaurant>>('/api/restaurants', options)
+        );
+      },
+    });
   }
 
   getRestaurant(slug: string) {

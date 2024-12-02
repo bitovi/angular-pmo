@@ -1,9 +1,13 @@
-import { Component, DestroyRef, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RestaurantService, Config, City, State } from './restaurant.service';
-import { Restaurant } from './restaurant';
-import { tap } from 'rxjs/operators';
+import { Component, effect, inject, Signal } from '@angular/core';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { RestaurantService } from './restaurant.service';
+import { map, pairwise, startWith } from 'rxjs/operators';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { RouterLink } from '@angular/router';
 import { NgIf, NgFor } from '@angular/common';
@@ -14,134 +18,96 @@ export interface Data<T> {
 }
 
 @Component({
-    selector: 'pmo-restaurant',
-    templateUrl: './restaurant.component.html',
-    styleUrls: ['./restaurant.component.css'],
-    imports: [
-        ReactiveFormsModule,
-        NgIf,
-        NgFor,
-        RouterLink,
-        ImageUrlPipe,
-    ]
+  selector: 'pmo-restaurant',
+  templateUrl: './restaurant.component.html',
+  styleUrls: ['./restaurant.component.css'],
+  imports: [ReactiveFormsModule, NgIf, NgFor, RouterLink, ImageUrlPipe],
 })
-export class RestaurantComponent implements OnInit {
-  form!: FormGroup<{
+export class RestaurantComponent {
+  private readonly fb: FormBuilder = inject(FormBuilder);
+  private readonly restaurantService: RestaurantService =
+    inject(RestaurantService);
+
+  readonly form: FormGroup<{
     state: FormControl<string>;
     city: FormControl<string>;
-  }>;
+  }> = this.fb.nonNullable.group({
+    state: { value: '', disabled: true },
+    city: { value: '', disabled: true },
+  });
 
-  public restaurants: Data<Restaurant> = {
-    value: [],
-    isPending: false,
-  };
-  public states: Data<State> = {
-    value: [],
-    isPending: true,
-  };
+  private readonly toggleStateControl = effect(() => {
+    const isLoading = this.statesResource.isLoading();
+    if (isLoading) {
+      this.form.controls.state.disable();
+    } else {
+      this.form.controls.state.enable();
+    }
+  });
 
-  public cities: Data<City> = {
-    value: [],
-    isPending: false,
-  };
+  private readonly stateControl: Signal<string> = toSignal(
+    this.form.controls.state.valueChanges,
+    { initialValue: this.form.controls.state.value }
+  );
 
-  constructor(
-    private restaurantService: RestaurantService,
-    private fb: FormBuilder,
-    private destroyRef: DestroyRef
-  ) {}
+  private readonly stateControlPrevCurr: Signal<{
+    prev: string;
+    curr: string;
+  }> = toSignal(
+    this.form.controls.state.valueChanges.pipe(
+      startWith(this.form.controls.state.value),
+      pairwise(),
+      map(([prev, curr]) => ({ prev, curr }))
+    ),
+    { initialValue: { prev: '', curr: this.form.controls.state.value } }
+  );
 
-  ngOnInit() {
-    this.createForm();
-    this.states.isPending = true;
-    this.restaurantService
-      .getStates()
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        tap((res: Config<State>) => {
-          this.states.value = res.data;
-          this.states.isPending = false;
-          this.form.controls.state.enable();
-        })
-      )
-      .subscribe();
-  }
+  private readonly cityControl: Signal<string> = toSignal(
+    this.form.controls.city.valueChanges,
+    { initialValue: this.form.controls.city.value }
+  );
 
-  createForm() {
-    this.form = this.fb.nonNullable.group({
-      state: { value: '', disabled: true },
-      city: { value: '', disabled: true },
-    });
+  private readonly toggleCityControlOnCitiesChange = effect(() => {
+    const isLoading = this.citiesResource.isLoading();
 
-    this.onChanges();
-  }
+    if (isLoading) {
+      this.form.controls.city.disable();
+    } else {
+      this.form.controls.city.enable();
+    }
+  });
+  private readonly toggleCityControlOnStateChange = effect(() => {
+    const state = this.stateControl();
 
-  onChanges(): void {
-    let state: string;
-    this.form.controls.state.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((val) => {
-        console.log('state', state, val);
-        if (val) {
-          this.form.controls.city.enable({
-            onlySelf: true,
-            emitEvent: false,
-          });
-          // eslint-disable-next-line eqeqeq
-          if (state != val) {
-            this.form.controls.city.patchValue('');
-            this.restaurants.value = [];
-          }
-          this.getCities(val);
-          state = val;
-        } else {
-          this.form.controls.city.disable({
-            onlySelf: true,
-            emitEvent: false,
-          });
-          state = '';
-          this.restaurants.value = [];
-        }
-      });
+    if (!state) {
+      this.form.controls.city.disable();
+    } else {
+      this.form.controls.city.enable();
+    }
+  });
 
-    this.form.controls.city.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((val) => {
-        if (val) {
-          this.getRestaurants(state, val);
-        }
-      });
-  }
+  private readonly resetCityControl = effect(() => {
+    const state = this.stateControlPrevCurr();
+    if (!state.curr || state.prev !== state.curr) {
+      this.form.controls.city.patchValue('');
+    }
+  });
 
-  getCities(state: string) {
-    this.cities.isPending = true;
-    this.restaurantService
-      .getCities(state)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        tap((res: Config<City>) => {
-          this.cities.value = res.data;
-          this.cities.isPending = false;
-          this.form.controls.city.enable({
-            onlySelf: true,
-            emitEvent: false,
-          });
-        })
-      )
-      .subscribe();
-  }
+  private readonly resetRestaurants = effect(() => {
+    const state = this.stateControlPrevCurr();
+    if (!state.curr || state.prev !== state.curr) {
+      this.restaurantsResource.set({ data: [] });
+    }
+  });
 
-  getRestaurants(state: string, city: string) {
-    this.restaurants.isPending = true;
-    this.restaurantService
-      .getRestaurants(state, city)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        tap((res: Config<Restaurant>) => {
-          this.restaurants.value = res.data;
-          this.restaurants.isPending = false;
-        })
-      )
-      .subscribe();
-  }
+  readonly statesResource = this.restaurantService.getStates();
+  readonly citiesResource = this.restaurantService.getCities(() => {
+    const state = this.stateControl();
+    return state ? { state } : undefined;
+  });
+  readonly restaurantsResource = this.restaurantService.getRestaurants(() => {
+    const state = this.stateControl();
+    const city = this.cityControl();
+    return state && city ? { state, city } : undefined;
+  });
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   FormBuilder,
@@ -12,8 +12,7 @@ import {
 import { RestaurantService } from '../restaurant/restaurant.service';
 import { Restaurant } from '../restaurant/restaurant';
 import { OrderService, Order, Item } from './order.service';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ItemTotalPipe } from '../shared/item-total.pipe';
 import { OnlyNumbersDirective } from '../shared/only-numbers.directive';
 import { MenuItemsComponent } from './menu-items/menu-items.component';
@@ -53,7 +52,7 @@ const minLengthArray =
     CurrencyPipe,
   ],
 })
-export class OrderComponent implements OnInit, OnDestroy {
+export class OrderComponent implements OnInit {
   orderForm?: FormGroup<OrderForm>;
   restaurant?: Restaurant;
   isLoading = true;
@@ -61,14 +60,14 @@ export class OrderComponent implements OnInit, OnDestroy {
   completedOrder?: Order;
   orderComplete = false;
   orderProcessing = false;
-  private unSubscribe = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,
     private restaurantService: RestaurantService,
     private orderService: OrderService,
     private formBuilder: FormBuilder,
-    private itemTotal: ItemTotalPipe
+    private itemTotal: ItemTotalPipe,
+    private destroyRef: DestroyRef,
   ) {}
 
   ngOnInit() {
@@ -79,11 +78,6 @@ export class OrderComponent implements OnInit, OnDestroy {
       this.isLoading = false;
       this.createOrderForm();
     });
-  }
-
-  ngOnDestroy(): void {
-    this.unSubscribe.next();
-    this.unSubscribe.complete();
   }
 
   createOrderForm() {
@@ -101,7 +95,7 @@ export class OrderComponent implements OnInit, OnDestroy {
   onChanges() {
     this.orderForm
       ?.get('items')
-      ?.valueChanges.pipe(takeUntil(this.unSubscribe))
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((val: Item[]) => {
         this.orderTotal = this.itemTotal.transform(val);
       });

@@ -1,10 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { Subject } from 'rxjs';
-
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RestaurantService, Config, City, State } from './restaurant.service';
 import { Restaurant } from './restaurant';
-import { takeUntil, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { RouterLink } from '@angular/router';
 import { NgIf, NgFor } from '@angular/common';
@@ -27,7 +26,7 @@ export interface Data<T> {
         ImageUrlPipe,
     ],
 })
-export class RestaurantComponent implements OnInit, OnDestroy {
+export class RestaurantComponent implements OnInit {
   form!: FormGroup<{
     state: FormControl<string>;
     city: FormControl<string>;
@@ -47,11 +46,10 @@ export class RestaurantComponent implements OnInit, OnDestroy {
     isPending: false,
   };
 
-  private unSubscribe = new Subject<void>();
-
   constructor(
     private restaurantService: RestaurantService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private destroyRef: DestroyRef
   ) {}
 
   ngOnInit() {
@@ -60,7 +58,7 @@ export class RestaurantComponent implements OnInit, OnDestroy {
     this.restaurantService
       .getStates()
       .pipe(
-        takeUntil(this.unSubscribe),
+        takeUntilDestroyed(this.destroyRef),
         tap((res: Config<State>) => {
           this.states.value = res.data;
           this.states.isPending = false;
@@ -68,11 +66,6 @@ export class RestaurantComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.unSubscribe.next();
-    this.unSubscribe.complete();
   }
 
   createForm() {
@@ -87,7 +80,7 @@ export class RestaurantComponent implements OnInit, OnDestroy {
   onChanges(): void {
     let state: string;
     this.form.controls.state.valueChanges
-      .pipe(takeUntil(this.unSubscribe))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((val) => {
         console.log('state', state, val);
         if (val) {
@@ -113,7 +106,7 @@ export class RestaurantComponent implements OnInit, OnDestroy {
       });
 
     this.form.controls.city.valueChanges
-      .pipe(takeUntil(this.unSubscribe))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((val) => {
         if (val) {
           this.getRestaurants(state, val);
@@ -126,7 +119,7 @@ export class RestaurantComponent implements OnInit, OnDestroy {
     this.restaurantService
       .getCities(state)
       .pipe(
-        takeUntil(this.unSubscribe),
+        takeUntilDestroyed(this.destroyRef),
         tap((res: Config<City>) => {
           this.cities.value = res.data;
           this.cities.isPending = false;
@@ -144,7 +137,7 @@ export class RestaurantComponent implements OnInit, OnDestroy {
     this.restaurantService
       .getRestaurants(state, city)
       .pipe(
-        takeUntil(this.unSubscribe),
+        takeUntilDestroyed(this.destroyRef),
         tap((res: Config<Restaurant>) => {
           this.restaurants.value = res.data;
           this.restaurants.isPending = false;

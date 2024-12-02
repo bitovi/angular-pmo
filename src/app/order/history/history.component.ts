@@ -11,11 +11,10 @@ interface Data<T> {
 }
 
 @Component({
-  selector: 'pmo-order-history',
-  templateUrl: './history.component.html',
-  styleUrls: ['./history.component.css'],
-  standalone: true,
-  imports: [OrderListComponent],
+    selector: 'pmo-order-history',
+    templateUrl: './history.component.html',
+    styleUrls: ['./history.component.css'],
+    imports: [OrderListComponent]
 })
 export class OrderHistoryComponent implements OnInit {
   orders: Data<Order> = {

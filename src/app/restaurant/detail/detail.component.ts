@@ -7,11 +7,10 @@ import { ImageUrlPipe } from '../../shared/image-url.pipe';
 import { NgIf, NgStyle } from '@angular/common';
 
 @Component({
-  selector: 'pmo-detail',
-  templateUrl: './detail.component.html',
-  styleUrls: ['./detail.component.css'],
-  standalone: true,
-  imports: [NgIf, NgStyle, RouterLink, ImageUrlPipe],
+    selector: 'pmo-detail',
+    templateUrl: './detail.component.html',
+    styleUrls: ['./detail.component.css'],
+    imports: [NgIf, NgStyle, RouterLink, ImageUrlPipe]
 })
 export class RestaurantDetailComponent implements OnInit {
   restaurant?: Restaurant;

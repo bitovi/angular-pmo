@@ -38,19 +38,18 @@ const minLengthArray =
   };
 
 @Component({
-  selector: 'pmo-order',
-  templateUrl: './order.component.html',
-  styleUrls: ['./order.component.css'],
-  standalone: true,
-  imports: [
-    NgIf,
-    OrderDetailsComponent,
-    ReactiveFormsModule,
-    TabsModule,
-    MenuItemsComponent,
-    OnlyNumbersDirective,
-    CurrencyPipe,
-  ],
+    selector: 'pmo-order',
+    templateUrl: './order.component.html',
+    styleUrls: ['./order.component.css'],
+    imports: [
+        NgIf,
+        OrderDetailsComponent,
+        ReactiveFormsModule,
+        TabsModule,
+        MenuItemsComponent,
+        OnlyNumbersDirective,
+        CurrencyPipe,
+    ]
 })
 export class OrderComponent implements OnInit {
   orderForm?: FormGroup<OrderForm>;

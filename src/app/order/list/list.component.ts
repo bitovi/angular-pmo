@@ -4,11 +4,10 @@ import { ItemTotalPipe } from '../../shared/item-total.pipe';
 import { NgIf, NgFor, NgClass, CurrencyPipe } from '@angular/common';
 
 @Component({
-  selector: 'pmo-order-list',
-  templateUrl: './list.component.html',
-  styleUrls: ['./list.component.css'],
-  standalone: true,
-  imports: [NgIf, NgFor, NgClass, CurrencyPipe, ItemTotalPipe],
+    selector: 'pmo-order-list',
+    templateUrl: './list.component.html',
+    styleUrls: ['./list.component.css'],
+    imports: [NgIf, NgFor, NgClass, CurrencyPipe, ItemTotalPipe]
 })
 export class OrderListComponent {
   @Input() orders: Order[] = [];

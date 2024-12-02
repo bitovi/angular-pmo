@@ -4,17 +4,16 @@ import { Item } from '../order.service';
 import { NgFor, CurrencyPipe } from '@angular/common';
 
 @Component({
-  selector: 'pmo-menu-items',
-  templateUrl: './menu-items.component.html',
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => MenuItemsComponent),
-      multi: true,
-    },
-  ],
-  standalone: true,
-  imports: [NgFor, CurrencyPipe],
+    selector: 'pmo-menu-items',
+    templateUrl: './menu-items.component.html',
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => MenuItemsComponent),
+            multi: true,
+        },
+    ],
+    imports: [NgFor, CurrencyPipe]
 })
 export class MenuItemsComponent implements ControlValueAccessor {
   @Input() data?: Item[];

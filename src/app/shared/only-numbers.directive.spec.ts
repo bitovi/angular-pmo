@@ -4,9 +4,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
 @Component({
-  template: `<input name="phone" type="text" pmoOnlyNumbers />`,
-  standalone: true,
-  imports: [OnlyNumbersDirective],
+    template: `<input name="phone" type="text" pmoOnlyNumbers />`,
+    imports: [OnlyNumbersDirective]
 })
 class TestInputComponent {}
 

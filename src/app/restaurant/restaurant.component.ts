@@ -17,14 +17,13 @@ export interface Data<T> {
     selector: 'pmo-restaurant',
     templateUrl: './restaurant.component.html',
     styleUrls: ['./restaurant.component.css'],
-    standalone: true,
     imports: [
         ReactiveFormsModule,
         NgIf,
         NgFor,
         RouterLink,
         ImageUrlPipe,
-    ],
+    ]
 })
 export class RestaurantComponent implements OnInit {
   form!: FormGroup<{

@@ -3,7 +3,6 @@ import { Item } from '../order/order.service';
 
 @Pipe({
   name: 'itemTotal',
-  standalone: true,
 })
 export class ItemTotalPipe implements PipeTransform {
   transform(items: Item[]): number {

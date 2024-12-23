@@ -11,11 +11,6 @@ import { map, pairwise, startWith } from 'rxjs/operators';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { RouterLink } from '@angular/router';
 
-export interface Data<T> {
-  value: T[];
-  isPending: boolean;
-}
-
 @Component({
   selector: 'pmo-restaurant',
   templateUrl: './restaurant.component.html',
@@ -89,13 +84,6 @@ export class RestaurantComponent {
     const state = this.stateControlPrevCurr();
     if (!state.curr || state.prev !== state.curr) {
       this.form.controls.city.patchValue('');
-    }
-  });
-
-  private readonly resetRestaurants = effect(() => {
-    const state = this.stateControlPrevCurr();
-    if (!state.curr || state.prev !== state.curr) {
-      this.restaurantsResource.set({ data: [] });
     }
   });
 

@@ -1,10 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
-
-import { RestaurantService } from './restaurant.service';
 import { RestaurantComponent } from './restaurant.component';
+import { provideHttpClient } from '@angular/common/http';
 
-const fakeStates = {
+const statesMock = {
   data: [
     { short: 'IL', name: 'Illinois' },
     { short: 'WI', name: 'Wisconsin' },
@@ -12,14 +10,14 @@ const fakeStates = {
   ],
 };
 
-const fakeCities = {
+const citiesMock = {
   data: [
     { name: 'Chicago', state: 'IL' },
     { name: 'Peoria', state: 'IL' },
   ],
 };
 
-const fakeRestaurants = {
+const restaurantsMock = {
   data: [
     {
       name: 'Crab Place',
@@ -108,20 +106,6 @@ const fakeRestaurants = {
   ],
 };
 
-class MockRestaurantService {
-  getStates() {
-    return of(fakeStates);
-  }
-
-  getCities() {
-    return of(fakeCities);
-  }
-
-  getRestaurants() {
-    return of(fakeRestaurants);
-  }
-}
-
 describe('RestaurantComponent', () => {
   let component: RestaurantComponent;
   let fixture: ComponentFixture<RestaurantComponent>;
@@ -129,15 +113,24 @@ describe('RestaurantComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [RestaurantComponent],
-      providers: [
-        { provide: RestaurantService, useClass: MockRestaurantService },
-      ],
+      providers: [provideHttpClient()],
     }).compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(RestaurantComponent);
     component = fixture.componentInstance;
+
+    spyOn(component['restaurantService'], 'statesLoader').and.returnValue(
+      Promise.resolve(statesMock),
+    );
+    spyOn(component['restaurantService'], 'citiesLoader').and.returnValue(
+      Promise.resolve(citiesMock),
+    );
+    spyOn(component['restaurantService'], 'restaurantsLoader').and.returnValue(
+      Promise.resolve(restaurantsMock),
+    );
+
     fixture.detectChanges();
   });
 
@@ -145,34 +138,55 @@ describe('RestaurantComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should get a list of states', () => {
-    expect(component.states.value).toEqual([
-      { short: 'IL', name: 'Illinois' },
-      { short: 'WI', name: 'Wisconsin' },
-      { short: 'MI', name: 'Michigan' },
-    ]);
+  it('should get a list of states', async () => {
+    expect(component.statesResource.isLoading()).toBe(true);
+
+    await fixture.whenStable();
+
+    const states = component.statesResource.value();
+    expect(states).toEqual(statesMock);
   });
 
-  it('should enable the state input when states have been fetched', () => {
-    expect(component.form.get('state')?.enabled).toBeTruthy();
+  it('should enable the state input when states have been fetched', async () => {
+    await fixture.whenStable();
+
+    fixture.detectChanges();
+
+    expect(component.form.controls.state.enabled).toBeTruthy();
   });
 
-  it('should enable the cities input when state has a value', () => {
-    component.form.get('state')?.patchValue('IL');
-    expect(component.form.get('city')?.enabled).toBeTruthy();
+  it('should enable the cities input when state has a value', async () => {
+    await fixture.whenStable();
+
+    component.form.controls.state.patchValue('IL');
+
+    await fixture.detectChanges();
+    await fixture.detectChanges();
+
+    expect(component.form.controls.city.enabled).toBeTruthy();
   });
 
-  it('should fetch a list of cities when state has a value', () => {
-    component.form.get('state')?.patchValue('IL');
-    expect(component.cities.value).toEqual([
-      { name: 'Chicago', state: 'IL' },
-      { name: 'Peoria', state: 'IL' },
-    ]);
+  it('should fetch a list of cities when state has a value', async () => {
+    await fixture.whenStable();
+
+    expect(component.citiesResource.value()).toEqual(undefined);
+
+    component.form.controls.state.patchValue('IL');
+
+    await fixture.detectChanges();
+    expect(component.citiesResource.value()).toEqual(citiesMock);
   });
 
-  it('should fetch a list of restaurants when state and city have values', () => {
-    component.form.get('state')?.patchValue('IL');
-    component.form.get('city')?.patchValue('Chicago');
-    expect(component.restaurants.value).toEqual(fakeRestaurants.data);
+  it('should fetch a list of restaurants when state and city have values', async () => {
+    await fixture.whenStable();
+
+    expect(component.restaurantsResource.value()).toEqual(undefined);
+
+    component.form.controls.state.patchValue('IL');
+    component.form.controls.city.patchValue('Chicago');
+
+    await fixture.detectChanges();
+
+    expect(component.restaurantsResource.value()).toEqual(restaurantsMock);
   });
 });

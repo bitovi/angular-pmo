@@ -12,7 +12,7 @@ import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { RouterLink } from '@angular/router';
 
 export interface Data<T> {
-  value: Array<T>;
+  value: T[];
   isPending: boolean;
 }
 

@@ -22,10 +22,10 @@ export class OrderListComponent {
   constructor(private orderService: OrderService) {}
 
   markAs(order: Order, action: string) {
-    this.orderService.updateOrder(order, action).subscribe(() => {});
+    this.orderService.updateOrder(order, action).subscribe();
   }
 
   delete(id: string) {
-    this.orderService.deleteOrder(id).subscribe(() => {});
+    this.orderService.deleteOrder(id).subscribe();
   }
 }

@@ -7,6 +7,7 @@ import {
   FormGroup,
   FormControl,
   ReactiveFormsModule,
+  ValidationErrors,
 } from '@angular/forms';
 
 import { RestaurantService } from '../restaurant/restaurant.service';
@@ -30,7 +31,7 @@ interface OrderForm {
 
 const minLengthArray =
   (min: number) =>
-  (c: AbstractControl): { [key: string]: any } | null => {
+  (c: AbstractControl): ValidationErrors | null => {
     if (c.value.length >= min) {
       return null;
     }

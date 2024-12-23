@@ -4,13 +4,13 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { RestaurantService } from '../restaurant.service';
 import { Restaurant } from '../restaurant';
 import { ImageUrlPipe } from '../../shared/image-url.pipe';
-import { NgIf, NgStyle } from '@angular/common';
+import { NgStyle } from '@angular/common';
 
 @Component({
-    selector: 'pmo-detail',
-    templateUrl: './detail.component.html',
-    styleUrls: ['./detail.component.css'],
-    imports: [NgIf, NgStyle, RouterLink, ImageUrlPipe]
+  selector: 'pmo-detail',
+  templateUrl: './detail.component.html',
+  styleUrls: ['./detail.component.css'],
+  imports: [NgStyle, RouterLink, ImageUrlPipe],
 })
 export class RestaurantDetailComponent implements OnInit {
   restaurant?: Restaurant;
@@ -18,7 +18,7 @@ export class RestaurantDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private restaurantService: RestaurantService
+    private restaurantService: RestaurantService,
   ) {}
 
   ngOnInit() {

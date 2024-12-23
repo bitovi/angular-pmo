@@ -11,10 +11,10 @@ interface Data<T> {
 }
 
 @Component({
-    selector: 'pmo-order-history',
-    templateUrl: './history.component.html',
-    styleUrls: ['./history.component.css'],
-    imports: [OrderListComponent]
+  selector: 'pmo-order-history',
+  templateUrl: './history.component.html',
+  styleUrls: ['./history.component.css'],
+  imports: [OrderListComponent],
 })
 export class OrderHistoryComponent implements OnInit {
   orders: Data<Order> = {
@@ -36,7 +36,7 @@ export class OrderHistoryComponent implements OnInit {
 
     this.socket.on('orders updated', (order: Order) => {
       const orderIndex = this.orders.value.findIndex(
-        (item) => item._id === order._id
+        (item) => item._id === order._id,
       );
       this.orders.value.splice(orderIndex, 1);
       this.orders.value.push(order);
@@ -44,7 +44,7 @@ export class OrderHistoryComponent implements OnInit {
 
     this.socket.on('orders removed', (order: Order) => {
       const orderIndex = this.orders.value.findIndex(
-        (item) => item._id === order._id
+        (item) => item._id === order._id,
       );
       this.orders.value.splice(orderIndex, 1);
     });
@@ -63,21 +63,21 @@ export class OrderHistoryComponent implements OnInit {
 
   get preparingOrders() {
     const orders = this.orders.value.filter(
-      (order) => order.status === 'preparing'
+      (order) => order.status === 'preparing',
     );
     return orders;
   }
 
   get deliveryOrders() {
     const orders = this.orders.value.filter(
-      (order) => order.status === 'delivery'
+      (order) => order.status === 'delivery',
     );
     return orders;
   }
 
   get deliveredOrders() {
     const orders = this.orders.value.filter(
-      (order) => order.status === 'delivered'
+      (order) => order.status === 'delivered',
     );
     return orders;
   }

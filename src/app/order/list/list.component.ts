@@ -1,13 +1,13 @@
 import { Component, Input } from '@angular/core';
 import { Order, OrderService } from '../order.service';
 import { ItemTotalPipe } from '../../shared/item-total.pipe';
-import { NgIf, NgFor, NgClass, CurrencyPipe } from '@angular/common';
+import { NgClass, CurrencyPipe } from '@angular/common';
 
 @Component({
-    selector: 'pmo-order-list',
-    templateUrl: './list.component.html',
-    styleUrls: ['./list.component.css'],
-    imports: [NgIf, NgFor, NgClass, CurrencyPipe, ItemTotalPipe]
+  selector: 'pmo-order-list',
+  templateUrl: './list.component.html',
+  styleUrls: ['./list.component.css'],
+  imports: [NgClass, CurrencyPipe, ItemTotalPipe],
 })
 export class OrderListComponent {
   @Input() orders: Order[] = [];

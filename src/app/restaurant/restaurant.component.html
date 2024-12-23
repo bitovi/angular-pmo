@@ -4,76 +4,71 @@
     @let statesResource = this.statesResource;
     <div class="form-group">
       <label>State</label>
-      <select
-        data-test="pmo-restaurant__select--state"
-        class="formControl"
-        formControlName="state"
-      >
-        <option value="" *ngIf="statesResource.isLoading()">Loading...</option>
-        <ng-container *ngIf="!statesResource.isLoading()">
+      <select class="formControl" formControlName="state">
+        @if (statesResource.isLoading()) {
+          <option value="">Loading...</option>
+        }
+        @if (!statesResource.isLoading()) {
           <option value="">Choose a state</option>
           @let states = statesResource.value()?.data;
-          <option *ngFor="let state of states" [value]="state.short">
-            {{ state.name }}
-          </option>
-        </ng-container>
+          @for (state of states; track state) {
+            <option [value]="state.short">
+              {{ state.name }}
+            </option>
+          }
+        }
       </select>
     </div>
     @let citiesResource = this.citiesResource;
     <div class="form-group">
       <label>City</label>
-      <select
-        data-test="pmo-restaurant__select--city"
-        class="formControl"
-        formControlName="city"
-      >
-        <option value="" *ngIf="citiesResource.isLoading()">Loading...</option>
-        <ng-container *ngIf="!citiesResource.isLoading()">
+      <select class="formControl" formControlName="city">
+        @if (citiesResource.isLoading()) {
+          <option value="">Loading...</option>
+        }
+        @if (!citiesResource.isLoading()) {
           <option value="">Choose a city</option>
           @let cities = citiesResource.value()?.data;
-          <option *ngFor="let city of cities" [value]="city.name">
-            {{ city.name }}
-          </option>
-        </ng-container>
+          @for (city of cities; track city) {
+            <option [value]="city.name">
+              {{ city.name }}
+            </option>
+          }
+        }
       </select>
     </div>
   </form>
 
   @let restaurantsResource = this.restaurantsResource;
-  <div class="restaurant loading" *ngIf="restaurantsResource.isLoading()"></div>
+  @if (restaurantsResource.isLoading()) {
+    <div class="restaurant loading"></div>
+  }
   @let restaurants = restaurantsResource.value()?.data;
-  <ng-container *ngIf="restaurants?.length">
-    <div
-      data-test="pmo-restaurant__list"
-      class="restaurant"
-      *ngFor="let restaurant of restaurants"
-    >
-      <img
-        src="{{ restaurant.images.thumbnail | imageUrl }}"
-        width="100"
-        height="100"
-      />
-      <h3>{{ restaurant.name }}</h3>
-
-      <div class="address" *ngIf="restaurant.address">
-        {{ restaurant.address.street }}<br />{{ restaurant.address.city }},
-        {{ restaurant.address.state }} {{ restaurant.address.zip }}
+  @if (restaurants?.length) {
+    @for (restaurant of restaurants; track restaurant) {
+      <div class="restaurant">
+        <img
+          src="{{ restaurant.images.thumbnail | imageUrl }}"
+          width="100"
+          height="100"
+        />
+        <h3>{{ restaurant.name }}</h3>
+        @if (restaurant.address) {
+          <div class="address">
+            {{ restaurant.address.street }}<br />{{ restaurant.address.city }},
+            {{ restaurant.address.state }} {{ restaurant.address.zip }}
+          </div>
+        }
+        <div class="hours-price">
+          $$$<br />
+          Hours: M-F 10am-11pm
+          <span class="open-now">Open Now</span>
+        </div>
+        <a class="btn" [routerLink]="['/restaurants', restaurant.slug]">
+          Details
+        </a>
+        <br />
       </div>
-
-      <div class="hours-price">
-        $$$<br />
-        Hours: M-F 10am-11pm
-        <span class="open-now">Open Now</span>
-      </div>
-
-      <a
-        data-test="pmo-restaurant__button--details"
-        class="btn"
-        [routerLink]="['/restaurants', restaurant.slug]"
-      >
-        Details
-      </a>
-      <br />
-    </div>
-  </ng-container>
+    }
+  }
 </div>

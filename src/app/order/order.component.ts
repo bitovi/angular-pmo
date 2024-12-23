@@ -18,7 +18,7 @@ import { OnlyNumbersDirective } from '../shared/only-numbers.directive';
 import { MenuItemsComponent } from './menu-items/menu-items.component';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { OrderDetailsComponent } from './details/details.component';
-import { NgIf, CurrencyPipe } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 
 interface OrderForm {
   restaurant: FormControl<string | undefined>;
@@ -38,18 +38,17 @@ const minLengthArray =
   };
 
 @Component({
-    selector: 'pmo-order',
-    templateUrl: './order.component.html',
-    styleUrls: ['./order.component.css'],
-    imports: [
-        NgIf,
-        OrderDetailsComponent,
-        ReactiveFormsModule,
-        TabsModule,
-        MenuItemsComponent,
-        OnlyNumbersDirective,
-        CurrencyPipe,
-    ]
+  selector: 'pmo-order',
+  templateUrl: './order.component.html',
+  styleUrls: ['./order.component.css'],
+  imports: [
+    OrderDetailsComponent,
+    ReactiveFormsModule,
+    TabsModule,
+    MenuItemsComponent,
+    OnlyNumbersDirective,
+    CurrencyPipe,
+  ],
 })
 export class OrderComponent implements OnInit {
   orderForm?: FormGroup<OrderForm>;

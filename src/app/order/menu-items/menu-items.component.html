@@ -1,6 +1,8 @@
-<li class="list-group-item" *ngFor="let item of data; let i = index">
+@for (item of data; track item) {
+  <li class="list-group-item">
     <label>
-      <input [attr.data-test]="'pmo-menu-items__checkbox--' + i" type="checkbox" (change)="toggleItem(item)">
-      {{item.name}} <span class="badge">{{item.price | currency}}</span>
+      <input type="checkbox" (change)="toggleItem(item)" />
+      {{ item.name }} <span class="badge">{{ item.price | currency }}</span>
     </label>
   </li>
+}

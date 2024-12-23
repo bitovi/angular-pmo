@@ -39,7 +39,7 @@ export class RestaurantService {
           params: new HttpParams().set('state', request!.state),
         };
         return firstValueFrom(
-          this.httpClient.get<Config<City>>('/api/cities', options)
+          this.httpClient.get<Config<City>>('/api/cities', options),
         );
       },
     });
@@ -55,7 +55,7 @@ export class RestaurantService {
             .set('filter[address.city]', request!.city),
         };
         return firstValueFrom(
-          this.httpClient.get<Config<Restaurant>>('/api/restaurants', options)
+          this.httpClient.get<Config<Restaurant>>('/api/restaurants', options),
         );
       },
     });

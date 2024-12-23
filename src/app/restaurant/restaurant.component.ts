@@ -10,7 +10,6 @@ import { RestaurantService } from './restaurant.service';
 import { map, pairwise, startWith } from 'rxjs/operators';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { RouterLink } from '@angular/router';
-import { NgIf, NgFor } from '@angular/common';
 
 export interface Data<T> {
   value: Array<T>;
@@ -21,7 +20,7 @@ export interface Data<T> {
   selector: 'pmo-restaurant',
   templateUrl: './restaurant.component.html',
   styleUrls: ['./restaurant.component.css'],
-  imports: [ReactiveFormsModule, NgIf, NgFor, RouterLink, ImageUrlPipe],
+  imports: [ReactiveFormsModule, RouterLink, ImageUrlPipe],
 })
 export class RestaurantComponent {
   private readonly fb: FormBuilder = inject(FormBuilder);
@@ -47,7 +46,7 @@ export class RestaurantComponent {
 
   private readonly stateControl: Signal<string> = toSignal(
     this.form.controls.state.valueChanges,
-    { initialValue: this.form.controls.state.value }
+    { initialValue: this.form.controls.state.value },
   );
 
   private readonly stateControlPrevCurr: Signal<{
@@ -57,14 +56,14 @@ export class RestaurantComponent {
     this.form.controls.state.valueChanges.pipe(
       startWith(this.form.controls.state.value),
       pairwise(),
-      map(([prev, curr]) => ({ prev, curr }))
+      map(([prev, curr]) => ({ prev, curr })),
     ),
-    { initialValue: { prev: '', curr: this.form.controls.state.value } }
+    { initialValue: { prev: '', curr: this.form.controls.state.value } },
   );
 
   private readonly cityControl: Signal<string> = toSignal(
     this.form.controls.city.valueChanges,
-    { initialValue: this.form.controls.city.value }
+    { initialValue: this.form.controls.city.value },
   );
 
   private readonly toggleCityControlOnCitiesChange = effect(() => {

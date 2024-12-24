@@ -1,31 +1,19 @@
+@let restaurant = restaurantResource.value();
+@let orderResource = createOrderResource;
+@let order = orderResource.value();
+
 <div class="order-form">
-  @if (orderComplete) {
-    @if (completedOrder) {
-      <pmo-order-details [order]="completedOrder"></pmo-order-details>
-    }
+  @if (order) {
+    <pmo-order-details [order]="order"></pmo-order-details>
     <p><button (click)="startNewOrder()">Place another order</button></p>
   } @else {
     <h2>Order here</h2>
-    @if (orderForm && restaurant) {
+    @if (restaurant) {
       <form [formGroup]="orderForm" (ngSubmit)="onSubmit()">
-        <tabset>
-          <tab heading="Lunch Menu">
-            <ul class="list-group">
-              <pmo-menu-items
-                [data]="restaurant.menu.lunch"
-                formControlName="items"
-              ></pmo-menu-items>
-            </ul>
-          </tab>
-          <tab heading="Dinner menu">
-            <ul class="list-group">
-              <pmo-menu-items
-                [data]="restaurant.menu.dinner"
-                formControlName="items"
-              ></pmo-menu-items>
-            </ul>
-          </tab>
-        </tabset>
+        <pmo-menu-items
+          [menu]="restaurant.menu"
+          formControlName="items"
+        ></pmo-menu-items>
         <div class="form-group">
           <label class="control-label">Name:</label>
           <input
@@ -58,13 +46,13 @@
           <p class="help-text">Please enter your phone number.</p>
         </div>
         <div class="submit">
-          <h4>Total: {{ orderTotal | currency }}</h4>
-          @if (orderProcessing) {
+          <h4>Total: {{ orderTotal() | currency }}</h4>
+          @if (orderResource.isLoading()) {
             <div class="loading"></div>
           }
           <button
             type="submit"
-            [disabled]="!orderForm.valid || orderProcessing"
+            [disabled]="!orderForm.valid || orderResource.isLoading()"
             class="btn"
           >
             Place My Order!

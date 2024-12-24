@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Item } from '../order/order.service';
+import { Item } from '../restaurant/restaurant';
 
 @Pipe({
   name: 'itemTotal',

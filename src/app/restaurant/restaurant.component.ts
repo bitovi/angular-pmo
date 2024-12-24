@@ -1,4 +1,4 @@
-import { Component, effect, inject, Signal } from '@angular/core';
+import { Component, effect, inject, linkedSignal, Signal } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -7,7 +7,6 @@ import {
 } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RestaurantService } from './restaurant.service';
-import { map, pairwise, startWith } from 'rxjs/operators';
 import { ImageUrlPipe } from '../shared/image-url.pipe';
 import { RouterLink } from '@angular/router';
 
@@ -44,17 +43,13 @@ export class RestaurantComponent {
     { initialValue: this.form.controls.state.value },
   );
 
-  private readonly stateControlPrevCurr: Signal<{
-    prev: string;
-    curr: string;
-  }> = toSignal(
-    this.form.controls.state.valueChanges.pipe(
-      startWith(this.form.controls.state.value),
-      pairwise(),
-      map(([prev, curr]) => ({ prev, curr })),
-    ),
-    { initialValue: { prev: '', curr: this.form.controls.state.value } },
-  );
+  private readonly stateControlPrevCurr = linkedSignal<
+    string,
+    { prev: string | undefined; curr: string }
+  >({
+    source: this.stateControl,
+    computation: (curr, prev) => ({ prev: prev?.source, curr }),
+  });
 
   private readonly cityControl: Signal<string> = toSignal(
     this.form.controls.city.valueChanges,
@@ -70,6 +65,7 @@ export class RestaurantComponent {
       this.form.controls.city.enable();
     }
   });
+
   private readonly toggleCityControlOnStateChange = effect(() => {
     const state = this.stateControl();
 
@@ -81,8 +77,8 @@ export class RestaurantComponent {
   });
 
   private readonly resetCityControl = effect(() => {
-    const state = this.stateControlPrevCurr();
-    if (!state.curr || state.prev !== state.curr) {
+    const { prev, curr } = this.stateControlPrevCurr();
+    if (!prev || prev !== curr) {
       this.form.controls.city.patchValue('');
     }
   });

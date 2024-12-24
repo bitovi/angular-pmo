@@ -4,7 +4,7 @@ import {
   importProvidersFrom,
   provideZoneChangeDetection,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
@@ -14,7 +14,7 @@ import { ItemTotalPipe } from './shared/item-total.pipe';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
+    provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(),
     importProvidersFrom(TabsModule.forRoot()),
     { provide: DEFAULT_CURRENCY_CODE, useValue: 'USD' },

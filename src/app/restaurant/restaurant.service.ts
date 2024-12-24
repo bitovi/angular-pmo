@@ -71,7 +71,18 @@ export class RestaurantService {
     });
   }
 
-  getRestaurant(slug: string) {
-    return this.http.get<Restaurant>('/api/restaurants/' + slug + '?');
+  restaurantLoader(request: { slug: string }): PromiseLike<Restaurant> {
+    return firstValueFrom(
+      this.http.get<Restaurant>('/api/restaurants/' + request.slug),
+    );
+  }
+
+  getRestaurant(
+    request: () => { slug: string } | undefined,
+  ): Resource<Restaurant> {
+    return resource({
+      request,
+      loader: ({ request }) => this.restaurantLoader(request!),
+    });
   }
 }

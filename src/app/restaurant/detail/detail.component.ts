@@ -1,8 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Component, inject, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { RestaurantService } from '../restaurant.service';
-import { Restaurant } from '../restaurant';
 import { ImageUrlPipe } from '../../shared/image-url.pipe';
 import { NgStyle } from '@angular/common';
 
@@ -12,24 +11,14 @@ import { NgStyle } from '@angular/common';
   styleUrls: ['./detail.component.css'],
   imports: [NgStyle, RouterLink, ImageUrlPipe],
 })
-export class RestaurantDetailComponent implements OnInit {
-  restaurant?: Restaurant;
-  isLoading = true;
+export class RestaurantDetailComponent {
+  private readonly restaurantService: RestaurantService =
+    inject(RestaurantService);
 
-  constructor(
-    private route: ActivatedRoute,
-    private restaurantService: RestaurantService,
-  ) {}
+  slug = input<string>();
+  restaurantResource = this.restaurantService.getRestaurant(() => {
+    const slug = this.slug();
 
-  ngOnInit() {
-    const slug = this.route.snapshot.paramMap.get('slug') as string;
-    this.restaurantService.getRestaurant(slug).subscribe((data: Restaurant) => {
-      this.restaurant = data;
-      this.isLoading = false;
-    });
-  }
-
-  getUrl(image: string): string {
-    return image.replace('node_modules/place-my-order-assets', './assets');
-  }
+    return slug ? { slug } : undefined;
+  });
 }

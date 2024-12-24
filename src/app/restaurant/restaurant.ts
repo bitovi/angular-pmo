@@ -1,8 +1,9 @@
-interface Item {
+export interface Item {
+  _id: string;
   name: string;
   price: number;
 }
-interface Menu {
+export interface Menu {
   lunch: Item[];
   dinner: Item[];
 }

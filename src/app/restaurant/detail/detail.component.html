@@ -1,3 +1,6 @@
+@let isLoading = restaurantResource.isLoading();
+@let restaurant = restaurantResource.value();
+
 @if (isLoading) {
   <div class="loading"></div>
 }
@@ -5,7 +8,7 @@
   <div
     class="restaurant-header"
     [ngStyle]="{
-      'background-image': 'url(' + getUrl(restaurant.images.banner) + ')',
+      'background-image': 'url(' + (restaurant.images.banner | imageUrl) + ')',
     }"
   >
     <div class="background">

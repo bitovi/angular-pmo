@@ -1,7 +1,8 @@
-import { Component, Input, forwardRef } from '@angular/core';
+import { Component, forwardRef, input } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Item } from '../order.service';
 import { CurrencyPipe } from '@angular/common';
+import { Item, Menu } from '../../restaurant/restaurant';
+import { TabsModule } from 'ngx-bootstrap/tabs';
 
 @Component({
   selector: 'pmo-menu-items',
@@ -13,48 +14,35 @@ import { CurrencyPipe } from '@angular/common';
       multi: true,
     },
   ],
-  imports: [CurrencyPipe],
+  imports: [TabsModule, CurrencyPipe],
 })
 export class MenuItemsComponent implements ControlValueAccessor {
-  @Input() data?: Item[];
+  readonly menu = input<Menu>();
+  private value: Item[] = [];
 
-  // eslint-disable-next-line @angular-eslint/no-input-rename
-  @Input('value') _value?: Item[];
+  onChange: (value: Item[]) => void = () => {};
+  onTouched: () => void = () => {};
 
-  onChange: any = () => {};
-  onTouched: any = () => {};
-
-  get value() {
-    return this._value;
-  }
-
-  set value(val) {
-    this._value = val;
-    this.onChange(val);
-    this.onTouched();
-  }
-
-  registerOnChange(fn: any): void {
+  registerOnChange(fn: (value: Item[]) => void): void {
     this.onChange = fn;
   }
 
-  registerOnTouched(fn: any): void {
+  registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
 
-  writeValue(value: any) {
+  writeValue(value: Item[]): void {
     this.value = value;
   }
 
   toggleItem(item: Item) {
-    if (this._value) {
-      const index = this._value.indexOf(item);
-      if (index !== -1) {
-        this._value.splice(index, 1);
-      } else {
-        this._value.push(item);
-      }
-      this.writeValue(this._value);
+    const selected = this.value.indexOf(item) !== -1;
+    if (selected) {
+      this.value = this.value.filter((i) => i._id !== item._id);
+    } else {
+      this.value = [...this.value, item];
     }
+    this.onChange(this.value);
+    this.onTouched();
   }
 }

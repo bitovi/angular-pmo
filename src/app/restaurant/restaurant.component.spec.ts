@@ -29,14 +29,18 @@ const restaurantsMock = {
       },
       menu: {
         lunch: [
-          { name: 'Garlic Fries', price: 15.99 },
-          { name: 'Crab Pancakes with Sorrel Syrup', price: 35.99 },
-          { name: 'Ricotta Gnocchi', price: 15.99 },
+          { _id: '1', name: 'Garlic Fries', price: 15.99 },
+          { _id: '2', name: 'Crab Pancakes with Sorrel Syrup', price: 35.99 },
+          { _id: '3', name: 'Ricotta Gnocchi', price: 15.99 },
         ],
         dinner: [
-          { name: 'Spinach Fennel Watercress Ravioli', price: 35.99 },
-          { name: 'Roasted Salmon', price: 23.99 },
-          { name: 'Herring in Lavender Dill Reduction', price: 45.99 },
+          { _id: '4', name: 'Spinach Fennel Watercress Ravioli', price: 35.99 },
+          { _id: '5', name: 'Roasted Salmon', price: 23.99 },
+          {
+            _id: '6',
+            name: 'Herring in Lavender Dill Reduction',
+            price: 45.99,
+          },
         ],
       },
       address: {
@@ -57,14 +61,14 @@ const restaurantsMock = {
       },
       menu: {
         lunch: [
-          { name: 'Spinach Fennel Watercress Ravioli', price: 35.99 },
-          { name: 'Crab Pancakes with Sorrel Syrup', price: 35.99 },
-          { name: 'Steamed Mussels', price: 21.99 },
+          { _id: '4', name: 'Spinach Fennel Watercress Ravioli', price: 35.99 },
+          { _id: '2', name: 'Crab Pancakes with Sorrel Syrup', price: 35.99 },
+          { _id: '7', name: 'Steamed Mussels', price: 21.99 },
         ],
         dinner: [
-          { name: 'Truffle Noodles', price: 14.99 },
-          { name: 'Charred Octopus', price: 25.99 },
-          { name: 'Ricotta Gnocchi', price: 15.99 },
+          { _id: '8', name: 'Truffle Noodles', price: 14.99 },
+          { _id: '9', name: 'Charred Octopus', price: 25.99 },
+          { _id: '3', name: 'Ricotta Gnocchi', price: 15.99 },
         ],
       },
       address: {
@@ -85,14 +89,18 @@ const restaurantsMock = {
       },
       menu: {
         lunch: [
-          { name: 'Crab Pancakes with Sorrel Syrup', price: 35.99 },
-          { name: 'Onion fries', price: 15.99 },
-          { name: 'Charred Octopus', price: 25.99 },
+          { _id: '2', name: 'Crab Pancakes with Sorrel Syrup', price: 35.99 },
+          { _id: '10', name: 'Onion fries', price: 15.99 },
+          { _id: '9', name: 'Charred Octopus', price: 25.99 },
         ],
         dinner: [
-          { name: 'Gunthorp Chicken', price: 21.99 },
-          { name: 'Spinach Fennel Watercress Ravioli', price: 35.99 },
-          { name: 'Garlic Fries', price: 15.99 },
+          { _id: '11', name: 'Gunthorp Chicken', price: 21.99 },
+          {
+            _id: '4',
+            name: 'Spinach Fennel Watercress Ravioli',
+            price: 35.99,
+          },
+          { _id: '1', name: 'Garlic Fries', price: 15.99 },
         ],
       },
       address: {
@@ -172,8 +180,8 @@ describe('RestaurantComponent', () => {
     expect(component.citiesResource.value()).toEqual(undefined);
 
     component.form.controls.state.patchValue('IL');
-
     await fixture.detectChanges();
+
     expect(component.citiesResource.value()).toEqual(citiesMock);
   });
 
@@ -183,8 +191,9 @@ describe('RestaurantComponent', () => {
     expect(component.restaurantsResource.value()).toEqual(undefined);
 
     component.form.controls.state.patchValue('IL');
-    component.form.controls.city.patchValue('Chicago');
+    await fixture.detectChanges();
 
+    component.form.controls.city.patchValue('Chicago');
     await fixture.detectChanges();
 
     expect(component.restaurantsResource.value()).toEqual(restaurantsMock);

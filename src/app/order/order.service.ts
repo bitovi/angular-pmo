@@ -1,6 +1,7 @@
-import { Injectable, resource, Resource, inject } from '@angular/core';
+import { Injectable, Resource, inject } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Config } from '../restaurant/restaurant.service';
 import { Item } from '../restaurant/restaurant';
 
@@ -32,15 +33,15 @@ export class OrderService {
     return this.http.get<Config<Order>>('/api/orders');
   }
 
-  createOrderLoader(request: { order: CreateOrderDto }): PromiseLike<Order> {
+  createOrderLoader(request: { order: CreateOrderDto }): Observable<Order> {
     const orderData = { ...request.order, status: 'new' };
-    return firstValueFrom(this.http.post<Order>('/api/orders', orderData));
+    return this.http.post<Order>('/api/orders', orderData);
   }
 
   createOrder(
     request: () => { order: CreateOrderDto } | undefined,
   ): Resource<Order> {
-    return resource({
+    return rxResource({
       request,
       loader: ({ request }) => this.createOrderLoader(request!),
     });

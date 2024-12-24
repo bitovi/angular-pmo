@@ -1,7 +1,8 @@
-import { Injectable, Resource, resource, inject } from '@angular/core';
+import { Injectable, Resource, inject } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Restaurant } from './restaurant';
-import { firstValueFrom } from 'rxjs';
 
 export interface Config<T> {
   data: T[];
@@ -23,26 +24,26 @@ export interface City {
 export class RestaurantService {
   private http = inject(HttpClient);
 
-  statesLoader(): PromiseLike<Config<State>> {
-    return firstValueFrom(this.http.get<Config<State>>('/api/states'));
+  statesLoader(): Observable<Config<State>> {
+    return this.http.get<Config<State>>('/api/states');
   }
 
   getStates(): Resource<Config<State>> {
-    return resource({
+    return rxResource({
       request: () => ({}),
       loader: () => this.statesLoader(),
     });
   }
 
-  citiesLoader(request: { state: string }): PromiseLike<Config<City>> {
+  citiesLoader(request: { state: string }): Observable<Config<City>> {
     const options = { params: new HttpParams().set('state', request.state) };
-    return firstValueFrom(this.http.get<Config<City>>('/api/cities', options));
+    return this.http.get<Config<City>>('/api/cities', options);
   }
 
   getCities(
     request: () => { state: string } | undefined,
   ): Resource<Config<City>> {
-    return resource({
+    return rxResource({
       request,
       loader: ({ request }) => this.citiesLoader(request!),
     });
@@ -51,36 +52,32 @@ export class RestaurantService {
   restaurantsLoader(request: {
     state: string;
     city: string;
-  }): PromiseLike<Config<Restaurant>> {
+  }): Observable<Config<Restaurant>> {
     const options = {
       params: new HttpParams()
         .set('filter[address.state]', request.state)
         .set('filter[address.city]', request.city),
     };
-    return firstValueFrom(
-      this.http.get<Config<Restaurant>>('/api/restaurants', options),
-    );
+    return this.http.get<Config<Restaurant>>('/api/restaurants', options);
   }
 
   getRestaurants(
     request: () => { state: string; city: string } | undefined,
   ): Resource<Config<Restaurant>> {
-    return resource({
+    return rxResource({
       request,
       loader: ({ request }) => this.restaurantsLoader(request!),
     });
   }
 
-  restaurantLoader(request: { slug: string }): PromiseLike<Restaurant> {
-    return firstValueFrom(
-      this.http.get<Restaurant>('/api/restaurants/' + request.slug),
-    );
+  restaurantLoader(request: { slug: string }): Observable<Restaurant> {
+    return this.http.get<Restaurant>('/api/restaurants/' + request.slug);
   }
 
   getRestaurant(
     request: () => { slug: string } | undefined,
   ): Resource<Restaurant> {
-    return resource({
+    return rxResource({
       request,
       loader: ({ request }) => this.restaurantLoader(request!),
     });

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RestaurantComponent } from './restaurant.component';
 import { provideHttpClient } from '@angular/common/http';
+import { of } from 'rxjs';
 
 const statesMock = {
   data: [
@@ -130,13 +131,13 @@ describe('RestaurantComponent', () => {
     component = fixture.componentInstance;
 
     spyOn(component['restaurantService'], 'statesLoader').and.returnValue(
-      Promise.resolve(statesMock),
+      of(statesMock),
     );
     spyOn(component['restaurantService'], 'citiesLoader').and.returnValue(
-      Promise.resolve(citiesMock),
+      of(citiesMock),
     );
     spyOn(component['restaurantService'], 'restaurantsLoader').and.returnValue(
-      Promise.resolve(restaurantsMock),
+      of(restaurantsMock),
     );
 
     fixture.detectChanges();

@@ -1,4 +1,4 @@
-import { Injectable, Resource, resource } from '@angular/core';
+import { Injectable, Resource, resource, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Restaurant } from './restaurant';
 import { firstValueFrom } from 'rxjs';
@@ -21,7 +21,7 @@ export interface City {
   providedIn: 'root',
 })
 export class RestaurantService {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   statesLoader(): PromiseLike<Config<State>> {
     return firstValueFrom(this.http.get<Config<State>>('/api/states'));

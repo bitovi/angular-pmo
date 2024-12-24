@@ -23,7 +23,7 @@ describe('OnlyNumbersDirective', () => {
   });
 
   it('should create an instance', () => {
-    const directive = new OnlyNumbersDirective(debugElement);
+    const directive = debugElement.injector.get(OnlyNumbersDirective);
     expect(directive).toBeTruthy();
   });
 

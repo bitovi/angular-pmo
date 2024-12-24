@@ -1,13 +1,13 @@
-import { Directive, ElementRef, HostListener } from '@angular/core';
+import { Directive, ElementRef, HostListener, inject } from '@angular/core';
 
 @Directive({
   selector: '[pmoOnlyNumbers]',
 })
 export class OnlyNumbersDirective {
+  private elementRef = inject(ElementRef);
+
   private allowedKeys: string[] = ['Backspace', 'ArrowLeft', 'ArrowRight'];
   private regExp = new RegExp(/^[0-9]*$/g);
-
-  constructor(private elementRef: ElementRef) {}
 
   @HostListener('keydown', ['$event'])
   onKeyDown(keyboardEvent: KeyboardEvent) {

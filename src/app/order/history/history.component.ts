@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { OrderService, Order } from '../order.service';
 import { Config } from '../../restaurant/restaurant.service';
 import io from 'socket.io-client';
@@ -17,15 +17,13 @@ interface Data<T> {
   imports: [OrderListComponent],
 })
 export class OrderHistoryComponent implements OnInit {
+  private orderService = inject(OrderService);
+
   orders: Data<Order> = {
     value: [],
     isPending: true,
   };
-  socket: SocketIOClient.Socket;
-
-  constructor(private orderService: OrderService) {
-    this.socket = io(environment.apiUrl);
-  }
+  socket: SocketIOClient.Socket = io(environment.apiUrl);
 
   ngOnInit() {
     this.getOrders();

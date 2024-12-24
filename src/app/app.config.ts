@@ -9,7 +9,6 @@ import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
 import { TabsModule } from 'ngx-bootstrap/tabs';
-import { ItemTotalPipe } from './shared/item-total.pipe';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,6 +17,5 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     importProvidersFrom(TabsModule.forRoot()),
     { provide: DEFAULT_CURRENCY_CODE, useValue: 'USD' },
-    ItemTotalPipe,
   ],
 };

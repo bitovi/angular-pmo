@@ -55,6 +55,7 @@ const minLengthArray =
     OnlyNumbersDirective,
     CurrencyPipe,
   ],
+  providers: [ItemTotalPipe],
 })
 export class OrderComponent {
   private readonly restaurantService = inject(RestaurantService);

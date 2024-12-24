@@ -1,4 +1,4 @@
-import { Injectable, resource, Resource } from '@angular/core';
+import { Injectable, resource, Resource, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { Config } from '../restaurant/restaurant.service';
@@ -26,7 +26,7 @@ interface CreateOrderDto {
   providedIn: 'root',
 })
 export class OrderService {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   getOrders() {
     return this.http.get<Config<Order>>('/api/orders');

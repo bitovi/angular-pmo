@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Order, OrderService } from '../order.service';
 import { ItemTotalPipe } from '../../shared/item-total.pipe';
 import { NgClass, CurrencyPipe } from '@angular/common';
@@ -10,6 +10,8 @@ import { NgClass, CurrencyPipe } from '@angular/common';
   imports: [NgClass, CurrencyPipe, ItemTotalPipe],
 })
 export class OrderListComponent {
+  private orderService = inject(OrderService);
+
   @Input() orders: Order[] = [];
   @Input() listTitle?: string;
   @Input() status?: string;
@@ -18,8 +20,6 @@ export class OrderListComponent {
   @Input() actionTitle?: string;
   @Input() emptyMessage?: string;
   isPending = false;
-
-  constructor(private orderService: OrderService) {}
 
   markAs(order: Order, action: string) {
     this.orderService.updateOrder(order, action).subscribe();

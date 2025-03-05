@@ -1,12 +1,9 @@
-import { Injectable, Resource, inject } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { Injectable, Resource } from '@angular/core';
 import {
-  HttpClient,
   HttpParams,
   httpResource,
   HttpResourceRef,
 } from '@angular/common/http';
-import { Observable } from 'rxjs';
 import { Restaurant } from './restaurant';
 
 export interface Config<T> {
@@ -27,61 +24,58 @@ export interface City {
   providedIn: 'root',
 })
 export class RestaurantService {
-  private http = inject(HttpClient);
-
-  getStates(): HttpResourceRef<Config<State> | undefined> {
-    return httpResource<Config<State>>({
-      url: '/api/states',
+  getStates(): HttpResourceRef<Config<State>> {
+    return httpResource<Config<State>>('/api/states', {
+      defaultValue: { data: [] },
     });
-  }
-
-  citiesLoader(request: { state: string }): Observable<Config<City>> {
-    const options = { params: new HttpParams().set('state', request.state) };
-    return this.http.get<Config<City>>('/api/cities', options);
   }
 
   getCities(
     request: () => { state: string } | undefined,
   ): Resource<Config<City>> {
-    return rxResource({
-      request,
-      loader: ({ request }) => this.citiesLoader(request!),
-      defaultValue: { data: [] },
-    });
-  }
+    return httpResource<Config<City>>(
+      () => {
+        const requestValue = request();
+        if (!requestValue) {
+          return undefined;
+        }
 
-  restaurantsLoader(request: {
-    state: string;
-    city: string;
-  }): Observable<Config<Restaurant>> {
-    const options = {
-      params: new HttpParams()
-        .set('filter[address.state]', request.state)
-        .set('filter[address.city]', request.city),
-    };
-    return this.http.get<Config<Restaurant>>('/api/restaurants', options);
+        const params = new HttpParams().set('state', requestValue.state);
+        return { url: '/api/cities', params };
+      },
+      { defaultValue: { data: [] } },
+    );
   }
 
   getRestaurants(
     request: () => { state: string; city: string } | undefined,
   ): Resource<Config<Restaurant>> {
-    return rxResource({
-      request,
-      loader: ({ request }) => this.restaurantsLoader(request!),
-      defaultValue: { data: [] },
-    });
-  }
+    return httpResource<Config<Restaurant>>(
+      () => {
+        const requestValue = request();
+        if (!requestValue) {
+          return undefined;
+        }
 
-  restaurantLoader(request: { slug: string }): Observable<Restaurant> {
-    return this.http.get<Restaurant>('/api/restaurants/' + request.slug);
+        const params = new HttpParams()
+          .set('filter[address.state]', requestValue.state)
+          .set('filter[address.city]', requestValue.city);
+
+        return { url: '/api/restaurants', params };
+      },
+      { defaultValue: { data: [] } },
+    );
   }
 
   getRestaurant(
     request: () => { slug: string } | undefined,
   ): Resource<Restaurant | undefined> {
-    return rxResource({
-      request,
-      loader: ({ request }) => this.restaurantLoader(request!),
+    return httpResource<Restaurant>(() => {
+      const slug = request()?.slug;
+      if (!slug) {
+        return undefined;
+      }
+      return `/api/restaurants/${slug}`;
     });
   }
 }

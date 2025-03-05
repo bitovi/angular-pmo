@@ -10,7 +10,7 @@
         }
         @if (!statesResource.isLoading()) {
           <option value="">Choose a state</option>
-          @let states = statesResource.value()?.data;
+          @let states = statesResource.value().data;
           @for (state of states; track state) {
             <option [value]="state.short">
               {{ state.name }}

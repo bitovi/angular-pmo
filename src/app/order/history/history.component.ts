@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { OrderService, Order } from '../order.service';
 import { Config } from '../../restaurant/restaurant.service';
 import io from 'socket.io-client';
 import { environment } from '../../../environments/environment';
+import { OrderListComponent } from '../list/list.component';
 
 interface Data<T> {
   value: T[];
@@ -12,20 +13,17 @@ interface Data<T> {
 @Component({
   selector: 'pmo-order-history',
   templateUrl: './history.component.html',
-  styleUrls: ['./history.component.css']
+  styleUrls: ['./history.component.css'],
+  imports: [OrderListComponent],
 })
 export class OrderHistoryComponent implements OnInit {
+  private orderService = inject(OrderService);
+
   orders: Data<Order> = {
     value: [],
-    isPending: true
+    isPending: true,
   };
-  socket: SocketIOClient.Socket;
-
-  constructor(
-    private orderService: OrderService
-    ) {
-      this.socket = io(environment.apiUrl);
-    }
+  socket: SocketIOClient.Socket = io(environment.apiUrl);
 
   ngOnInit() {
     this.getOrders();
@@ -35,13 +33,17 @@ export class OrderHistoryComponent implements OnInit {
     });
 
     this.socket.on('orders updated', (order: Order) => {
-      const orderIndex =  this.orders.value.findIndex(item => item._id === order._id);
+      const orderIndex = this.orders.value.findIndex(
+        (item) => item._id === order._id,
+      );
       this.orders.value.splice(orderIndex, 1);
       this.orders.value.push(order);
     });
 
     this.socket.on('orders removed', (order: Order) => {
-      const orderIndex =  this.orders.value.findIndex(item => item._id === order._id);
+      const orderIndex = this.orders.value.findIndex(
+        (item) => item._id === order._id,
+      );
       this.orders.value.splice(orderIndex, 1);
     });
   }
@@ -53,23 +55,28 @@ export class OrderHistoryComponent implements OnInit {
   }
 
   get newOrders() {
-    const orders =  this.orders.value.filter((order) => order.status === 'new');
+    const orders = this.orders.value.filter((order) => order.status === 'new');
     return orders;
   }
 
-   get preparingOrders() {
-    const orders =  this.orders.value.filter((order) => order.status === 'preparing');
+  get preparingOrders() {
+    const orders = this.orders.value.filter(
+      (order) => order.status === 'preparing',
+    );
     return orders;
-   }
+  }
 
-   get deliveryOrders() {
-    const orders =  this.orders.value.filter((order) => order.status === 'delivery');
+  get deliveryOrders() {
+    const orders = this.orders.value.filter(
+      (order) => order.status === 'delivery',
+    );
     return orders;
-   }
+  }
 
-   get deliveredOrders() {
-    const orders =  this.orders.value.filter((order) => order.status === 'delivered');
+  get deliveredOrders() {
+    const orders = this.orders.value.filter(
+      (order) => order.status === 'delivered',
+    );
     return orders;
-   }
-
+  }
 }

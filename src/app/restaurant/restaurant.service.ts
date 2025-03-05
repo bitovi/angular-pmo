@@ -1,5 +1,9 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable, Resource } from '@angular/core';
+import {
+  HttpParams,
+  httpResource,
+  HttpResourceRef,
+} from '@angular/common/http';
 import { Restaurant } from './restaurant';
 
 export interface Config<T> {
@@ -17,27 +21,61 @@ export interface City {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RestaurantService {
-
-  constructor(private httpClient: HttpClient) { }
-
-  getStates() {
-    return this.httpClient.get<Config<State>>('/api/states');
+  getStates(): HttpResourceRef<Config<State>> {
+    return httpResource<Config<State>>('/api/states', {
+      defaultValue: { data: [] },
+    });
   }
 
-  getCities(state: string) {
-    const options = { params: new HttpParams().set('state', state)};
-    return this.httpClient.get<Config<City>>('/api/cities', options);
+  getCities(
+    request: () => { state: string } | undefined,
+  ): Resource<Config<City>> {
+    return httpResource<Config<City>>(
+      () => {
+        const requestValue = request();
+        if (!requestValue) {
+          return undefined;
+        }
+
+        const params = new HttpParams().set('state', requestValue.state);
+        return { url: '/api/cities', params };
+      },
+      { defaultValue: { data: [] } },
+    );
   }
 
-  getRestaurants(state: string, city: string) {
-    const options = { params: new HttpParams().set('filter[address.state]', state).set('filter[address.city]', city) };
-    return this.httpClient.get<Config<Restaurant>>('/api/restaurants', options);
+  getRestaurants(
+    request: () => { state: string; city: string } | undefined,
+  ): Resource<Config<Restaurant>> {
+    return httpResource<Config<Restaurant>>(
+      () => {
+        const requestValue = request();
+        if (!requestValue) {
+          return undefined;
+        }
+
+        const params = new HttpParams()
+          .set('filter[address.state]', requestValue.state)
+          .set('filter[address.city]', requestValue.city);
+
+        return { url: '/api/restaurants', params };
+      },
+      { defaultValue: { data: [] } },
+    );
   }
 
-  getRestaurant(slug: string) {
-    return this.httpClient.get<Restaurant>('/api/restaurants/' + slug + '?');
+  getRestaurant(
+    request: () => { slug: string } | undefined,
+  ): Resource<Restaurant | undefined> {
+    return httpResource<Restaurant>(() => {
+      const slug = request()?.slug;
+      if (!slug) {
+        return undefined;
+      }
+      return `/api/restaurants/${slug}`;
+    });
   }
 }

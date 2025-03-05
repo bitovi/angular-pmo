@@ -1,11 +1,11 @@
 import { OnlyNumbersDirective } from './only-numbers.directive';
-import {Component, DebugElement} from "@angular/core";
-import {ComponentFixture, TestBed} from "@angular/core/testing";
-import {FormsModule} from "@angular/forms";
-import {By} from "@angular/platform-browser";
+import { Component, DebugElement } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 
 @Component({
-  template: `<input name="phone" type="text" pmoOnlyNumbers />`
+  template: `<input name="phone" type="text" pmoOnlyNumbers />`,
+  imports: [OnlyNumbersDirective],
 })
 class TestInputComponent {}
 
@@ -15,22 +15,21 @@ describe('OnlyNumbersDirective', () => {
 
   beforeEach(() => {
     fixture = TestBed.configureTestingModule({
-      declarations: [OnlyNumbersDirective, TestInputComponent],
-      imports: [FormsModule],
-      providers: []
+      imports: [TestInputComponent],
+      providers: [],
     }).createComponent(TestInputComponent);
     fixture.detectChanges();
     debugElement = fixture.debugElement.query(By.css('input'));
   });
 
   it('should create an instance', () => {
-    const directive = new OnlyNumbersDirective(debugElement);
+    const directive = debugElement.injector.get(OnlyNumbersDirective);
     expect(directive).toBeTruthy();
   });
 
   it('should contain only text 329053', () => {
     const inputString = '32T90V53CFACR';
-     simulateTyping(inputString);
+    simulateTyping(inputString);
     expect(debugElement.nativeElement.value).toEqual('329053');
   });
 
@@ -49,10 +48,12 @@ describe('OnlyNumbersDirective', () => {
   function simulateTyping(value: string) {
     let buildString = '';
     for (const singleValue of value) {
-      const keydownEvent = new KeyboardEvent('keydown', { key: singleValue, cancelable: true });
+      const keydownEvent = new KeyboardEvent('keydown', {
+        key: singleValue,
+        cancelable: true,
+      });
       debugElement.nativeElement.dispatchEvent(keydownEvent);
-      if (keydownEvent.defaultPrevented) {
-      } else {
+      if (!keydownEvent.defaultPrevented) {
         buildString = `${buildString}${singleValue}`;
       }
     }

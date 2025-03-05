@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { OrderHistoryComponent } from './history.component';
@@ -9,10 +9,9 @@ describe('OrderHistoryComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ HttpClientModule ],
-      declarations: [ OrderHistoryComponent ],
-    })
-    .compileComponents();
+      imports: [OrderHistoryComponent],
+      providers: [provideHttpClient()],
+    }).compileComponents();
   });
 
   beforeEach(() => {

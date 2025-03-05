@@ -1,6 +1,28 @@
-<li class="list-group-item" *ngFor="let item of data; let i = index">
-    <label>
-      <input [attr.data-test]="'pmo-menu-items__checkbox--' + i" type="checkbox" (change)="toggleItem(item)">
-      {{item.name}} <span class="badge">{{item.price | currency}}</span>
-    </label>
-  </li>
+<tabset>
+  <tab heading="Lunch Menu">
+    <ul class="list-group">
+      @for (item of menu()?.lunch; track item) {
+        <li class="list-group-item">
+          <label>
+            <input type="checkbox" (change)="toggleItem(item)" />
+            {{ item.name }}
+            <span class="badge">{{ item.price | currency }}</span>
+          </label>
+        </li>
+      }
+    </ul>
+  </tab>
+  <tab heading="Dinner menu">
+    <ul class="list-group">
+      @for (item of menu()?.dinner; track item) {
+        <li class="list-group-item">
+          <label>
+            <input type="checkbox" (change)="toggleItem(item)" />
+            {{ item.name }}
+            <span class="badge">{{ item.price | currency }}</span>
+          </label>
+        </li>
+      }
+    </ul>
+  </tab>
+</tabset>

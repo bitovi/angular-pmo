@@ -1,22 +1,34 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import {
-  FormBuilder,
+  Component,
+  computed,
+  inject,
+  input,
+  linkedSignal,
+  ResourceStatus,
+  signal,
+  Signal,
+} from '@angular/core';
+import {
   AbstractControl,
   Validators,
   FormGroup,
   FormControl,
+  ReactiveFormsModule,
+  ValidationErrors,
+  NonNullableFormBuilder,
 } from '@angular/forms';
 
 import { RestaurantService } from '../restaurant/restaurant.service';
-import { Restaurant } from '../restaurant/restaurant';
-import { OrderService, Order, Item } from './order.service';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { OrderService } from './order.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ItemTotalPipe } from '../shared/item-total.pipe';
+import { OnlyNumbersDirective } from '../shared/only-numbers.directive';
+import { MenuItemsComponent } from './menu-items/menu-items.component';
+import { OrderDetailsComponent } from './details/details.component';
+import { CurrencyPipe } from '@angular/common';
+import { Item } from '../restaurant/restaurant';
 
 interface OrderForm {
-  restaurant: FormControl<string | undefined>;
   name: FormControl<string>;
   address: FormControl<string>;
   phone: FormControl<string>;
@@ -25,7 +37,7 @@ interface OrderForm {
 
 const minLengthArray =
   (min: number) =>
-  (c: AbstractControl): { [key: string]: any } | null => {
+  (c: AbstractControl): ValidationErrors | null => {
     if (c.value.length >= min) {
       return null;
     }
@@ -36,77 +48,86 @@ const minLengthArray =
   selector: 'pmo-order',
   templateUrl: './order.component.html',
   styleUrls: ['./order.component.css'],
+  imports: [
+    OrderDetailsComponent,
+    ReactiveFormsModule,
+    MenuItemsComponent,
+    OnlyNumbersDirective,
+    CurrencyPipe,
+  ],
+  providers: [ItemTotalPipe],
 })
-export class OrderComponent implements OnInit, OnDestroy {
-  orderForm?: FormGroup<OrderForm>;
-  restaurant?: Restaurant;
-  isLoading = true;
-  orderTotal = 0.0;
-  completedOrder?: Order;
-  orderComplete = false;
-  orderProcessing = false;
-  private unSubscribe = new Subject<void>();
+export class OrderComponent {
+  private readonly restaurantService = inject(RestaurantService);
+  private readonly orderService = inject(OrderService);
+  private readonly fb = inject(NonNullableFormBuilder);
+  private readonly itemTotal = inject(ItemTotalPipe);
 
-  constructor(
-    private route: ActivatedRoute,
-    private restaurantService: RestaurantService,
-    private orderService: OrderService,
-    private formBuilder: FormBuilder,
-    private itemTotal: ItemTotalPipe
-  ) {}
+  slug = input<string>();
 
-  ngOnInit() {
-    const slug = this.route.snapshot.paramMap.get('slug') as string;
+  readonly ResourceStatus = ResourceStatus;
 
-    this.restaurantService.getRestaurant(slug).subscribe((data: Restaurant) => {
-      this.restaurant = data;
-      this.isLoading = false;
-      this.createOrderForm();
-    });
-  }
+  readonly orderForm: FormGroup<OrderForm> = this.fb.group({
+    name: this.fb.control('', [Validators.required]),
+    address: this.fb.control('', [Validators.required]),
+    phone: this.fb.control('', [Validators.required]),
+    items: this.fb.control<Item[]>([], [minLengthArray(1)]),
+  });
 
-  ngOnDestroy(): void {
-    this.unSubscribe.next();
-    this.unSubscribe.complete();
-  }
+  private readonly itemsControl: Signal<Item[]> = toSignal(
+    this.orderForm.controls.items.valueChanges,
+    { initialValue: this.orderForm.controls.items.value },
+  );
 
-  createOrderForm() {
-    const restaurantId = this.restaurant && this.restaurant._id;
-    this.orderForm = this.formBuilder.nonNullable.group({
-      restaurant: [restaurantId],
-      name: ['', Validators.required],
-      address: ['', Validators.required],
-      phone: ['', Validators.required],
-      items: [[] as Item[], minLengthArray(1)],
-    });
-    this.onChanges();
-  }
+  readonly orderTotal = computed(() => {
+    const items = this.itemsControl();
+    return this.itemTotal.transform(items);
+  });
 
-  onChanges() {
-    this.orderForm
-      ?.get('items')
-      ?.valueChanges.pipe(takeUntil(this.unSubscribe))
-      .subscribe((val: Item[]) => {
-        this.orderTotal = this.itemTotal.transform(val);
-      });
-  }
+  readonly restaurantResource = this.restaurantService.getRestaurant(() => {
+    const slug = this.slug();
 
-  onSubmit() {
-    if (!this.orderForm?.valid) {
+    return slug ? { slug } : undefined;
+  });
+
+  readonly submitClicked = signal<number>(0);
+
+  readonly formStatus = toSignal(this.orderForm.statusChanges, {
+    initialValue: this.orderForm.status,
+  });
+
+  readonly shouldCreateOrder = linkedSignal<
+    { clicked: number; valid: boolean },
+    boolean
+  >({
+    source: () => ({
+      clicked: this.submitClicked(),
+      valid: this.formStatus() === 'VALID',
+    }),
+    computation: (source, previous) =>
+      source.clicked !== previous?.source.clicked && source.valid,
+  });
+
+  readonly createOrderResource = this.orderService.createOrder(() => {
+    const restaurantId = this.restaurantResource.value()?._id;
+
+    if (!this.shouldCreateOrder() || !restaurantId) {
       return;
     }
-    this.orderProcessing = true;
-    this.orderService
-      .createOrder(this.orderForm.getRawValue())
-      .subscribe((newOrder) => {
-        this.completedOrder = newOrder;
-        this.orderComplete = true;
-        this.orderProcessing = false;
-      });
+
+    return {
+      order: {
+        ...this.orderForm.getRawValue(),
+        restaurant: restaurantId,
+      },
+    };
+  });
+
+  onSubmit() {
+    this.submitClicked.set(this.submitClicked() + 1);
   }
 
   startNewOrder() {
-    this.orderComplete = false;
-    this.createOrderForm();
+    this.orderForm.controls.items.setValue([]);
   }
 }

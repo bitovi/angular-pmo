@@ -1,49 +1,74 @@
 <div class="restaurants">
   <h2 class="page-header">Restaurants</h2>
   <form class="form" [formGroup]="form">
+    @let statesResource = this.statesResource;
     <div class="form-group">
       <label>State</label>
-      <select data-test="pmo-restaurant__select--state" class="formControl" formControlName="state">
-        <option value="" *ngIf="states.isPending">Loading...</option>
-        <ng-container *ngIf="!states.isPending">
+      <select class="formControl" formControlName="state">
+        @if (statesResource.isLoading()) {
+          <option value="">Loading...</option>
+        }
+        @if (!statesResource.isLoading()) {
           <option value="">Choose a state</option>
-          <option *ngFor="let state of states.value" value="{{state?.short}}"> {{state?.name}}</option>
-        </ng-container>
+          @let states = statesResource.value().data;
+          @for (state of states; track state) {
+            <option [value]="state.short">
+              {{ state.name }}
+            </option>
+          }
+        }
       </select>
     </div>
+    @let citiesResource = this.citiesResource;
     <div class="form-group">
       <label>City</label>
-      <select data-test="pmo-restaurant__select--city" class="formControl" formControlName="city">
-        <option value="" *ngIf="cities.isPending">Loading...</option>
-        <ng-container *ngIf="!cities.isPending">
+      <select class="formControl" formControlName="city">
+        @if (citiesResource.isLoading()) {
+          <option value="">Loading...</option>
+        }
+        @if (!citiesResource.isLoading()) {
           <option value="">Choose a city</option>
-          <option *ngFor="let city of cities.value" value="{{city.name}}"> {{city.name}}</option>
-        </ng-container>
+          @let cities = citiesResource.value().data;
+          @for (city of cities; track city) {
+            <option [value]="city.name">
+              {{ city.name }}
+            </option>
+          }
+        }
       </select>
     </div>
   </form>
 
-  <div class="restaurant loading" *ngIf="restaurants.isPending"></div>
-  <ng-container *ngIf="restaurants.value.length">
-    <div data-test="pmo-restaurant__list" class="restaurant" *ngFor="let restaurant of restaurants.value">
-
-      <img src="{{restaurant.images.thumbnail | imageUrl}}" width="100" height="100">
-      <h3>{{restaurant.name}}</h3>
-
-      <div class="address" *ngIf="restaurant.address">
-        {{restaurant.address.street}}<br />{{restaurant.address.city}}, {{restaurant.address.state}} {{restaurant.address.zip}}
+  @let restaurantsResource = this.restaurantsResource;
+  @if (restaurantsResource.isLoading()) {
+    <div class="restaurant loading"></div>
+  }
+  @let restaurants = restaurantsResource.value().data;
+  @if (restaurants?.length) {
+    @for (restaurant of restaurants; track restaurant) {
+      <div class="restaurant">
+        <img
+          src="{{ restaurant.images.thumbnail | imageUrl }}"
+          width="100"
+          height="100"
+        />
+        <h3>{{ restaurant.name }}</h3>
+        @if (restaurant.address) {
+          <div class="address">
+            {{ restaurant.address.street }}<br />{{ restaurant.address.city }},
+            {{ restaurant.address.state }} {{ restaurant.address.zip }}
+          </div>
+        }
+        <div class="hours-price">
+          $$$<br />
+          Hours: M-F 10am-11pm
+          <span class="open-now">Open Now</span>
+        </div>
+        <a class="btn" [routerLink]="['/restaurants', restaurant.slug]">
+          Details
+        </a>
+        <br />
       </div>
-
-      <div class="hours-price">
-        $$$<br />
-        Hours: M-F 10am-11pm
-        <span class="open-now">Open Now</span>
-      </div>
-
-      <a data-test="pmo-restaurant__button--details" class="btn" [routerLink]="['/restaurants', restaurant.slug]">
-        Details
-      </a>
-      <br />
-    </div>
-  </ng-container>
+    }
+  }
 </div>

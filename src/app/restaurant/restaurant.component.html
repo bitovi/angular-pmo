@@ -28,7 +28,7 @@
         }
         @if (!citiesResource.isLoading()) {
           <option value="">Choose a city</option>
-          @let cities = citiesResource.value()?.data;
+          @let cities = citiesResource.value().data;
           @for (city of cities; track city) {
             <option [value]="city.name">
               {{ city.name }}
@@ -43,7 +43,7 @@
   @if (restaurantsResource.isLoading()) {
     <div class="restaurant loading"></div>
   }
-  @let restaurants = restaurantsResource.value()?.data;
+  @let restaurants = restaurantsResource.value().data;
   @if (restaurants?.length) {
     @for (restaurant of restaurants; track restaurant) {
       <div class="restaurant">

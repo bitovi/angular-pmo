@@ -1,6 +1,11 @@
 import { Injectable, Resource, inject } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpParams,
+  httpResource,
+  HttpResourceRef,
+} from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Restaurant } from './restaurant';
 
@@ -24,14 +29,9 @@ export interface City {
 export class RestaurantService {
   private http = inject(HttpClient);
 
-  statesLoader(): Observable<Config<State>> {
-    return this.http.get<Config<State>>('/api/states');
-  }
-
-  getStates(): Resource<Config<State>> {
-    return rxResource({
-      request: () => ({}),
-      loader: () => this.statesLoader(),
+  getStates(): HttpResourceRef<Config<State> | undefined> {
+    return httpResource<Config<State>>({
+      url: '/api/states',
     });
   }
 
@@ -46,6 +46,7 @@ export class RestaurantService {
     return rxResource({
       request,
       loader: ({ request }) => this.citiesLoader(request!),
+      defaultValue: { data: [] },
     });
   }
 
@@ -67,6 +68,7 @@ export class RestaurantService {
     return rxResource({
       request,
       loader: ({ request }) => this.restaurantsLoader(request!),
+      defaultValue: { data: [] },
     });
   }
 
@@ -76,7 +78,7 @@ export class RestaurantService {
 
   getRestaurant(
     request: () => { slug: string } | undefined,
-  ): Resource<Restaurant> {
+  ): Resource<Restaurant | undefined> {
     return rxResource({
       request,
       loader: ({ request }) => this.restaurantLoader(request!),

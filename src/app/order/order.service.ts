@@ -40,7 +40,7 @@ export class OrderService {
 
   createOrder(
     request: () => { order: CreateOrderDto } | undefined,
-  ): Resource<Order> {
+  ): Resource<Order | undefined> {
     return rxResource({
       request,
       loader: ({ request }) => this.createOrderLoader(request!),
